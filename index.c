@@ -246,9 +246,9 @@ int main()
   //  for (i=0;i<unneeded_word;i++)
   //  printf("%s\n",forbidden[i]);
 
-  if ((f=fopen("vanban.txt","r"))==NULL)
+  if ((f=fopen("2000010a.txt","r"))==NULL)
     {
-      printf("Can't open file stopw.txt!\n");
+      printf("Can't open file 2000010a.txt!\n");
       exit(1);
     }
 	
