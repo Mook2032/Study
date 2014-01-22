@@ -6,8 +6,8 @@
 //MAX_LINE is the maximum number of character can be stored in wrdoccurence.
 //MAX_WORD is the maximum number of different words.
 
-#define MAX_LINE 1000
-#define MAX_WORD 2000
+#define MAX_LINE 10000
+#define MAX_WORD 20000
 
 #define CAPTION_OK 1
 #define CAPTION_NOT_OK 0
