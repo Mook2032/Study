@@ -185,7 +185,7 @@ Token* readString(void) {
 			     case 'n': currentChar=10; break;
 			     case '\n': readChar(); break;
 			     default:
-			       token->string[count++]='\\';
+			       token->string[count++]=(char)currentChar;
 			       if (count>=MAX_IDENT_LEN)
 				 {
 				     error(ERR_IDENTTOOLONG,token->lineNo,token->colNo);
