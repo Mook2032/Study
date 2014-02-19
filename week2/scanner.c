@@ -256,6 +256,7 @@ Token* getToken(void) {
 		if (charCodes[currentChar]==CHAR_PERIOD)
 		{
 			token=makeToken(SB_LSEL, ln, cn);
+			readChar();
 			return token;
 		}
 		if (charCodes[currentChar]==CHAR_TIMES)
