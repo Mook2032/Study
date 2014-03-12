@@ -229,7 +229,8 @@ void compileParams(void) {
 }
 
 void compileParams2(void) {
-	if (lookAhead->tokenType == SB_SEMICOLON)
+  //	if (lookAhead->tokenType == SB_SEMICOLON)
+	if (lookAhead->tokenType != KW_END)
 	{
 		eat(SB_SEMICOLON);
 		compileParam();
