@@ -19,6 +19,7 @@ struct {
   {"INTEGER", KW_INTEGER},
   {"CHAR", KW_CHAR},
   {"ARRAY", KW_ARRAY},
+  {"STRING", KW_STRING},
   {"OF", KW_OF},
   {"FUNCTION", KW_FUNCTION},
   {"PROCEDURE", KW_PROCEDURE},
@@ -65,6 +66,7 @@ char *tokenToString(TokenType tokenType) {
   case TK_NUMBER: return "a number";
   case TK_CHAR: return "a constant char";
   case TK_EOF: return "end of file";
+  case TK_STRING: return "a string";
 
   case KW_PROGRAM: return "keyword PROGRAM";
   case KW_CONST: return "keyword CONST";
@@ -73,6 +75,7 @@ char *tokenToString(TokenType tokenType) {
   case KW_INTEGER: return "keyword INTEGER";
   case KW_CHAR: return "keyword CHAR";
   case KW_ARRAY: return "keyword ARRAY";
+  case KW_STRING: return "keyword STRING";
   case KW_OF: return "keyword OF";
   case KW_FUNCTION: return "keyword FUNCTION";
   case KW_PROCEDURE: return "keyword PROCEDURE";
@@ -102,6 +105,7 @@ char *tokenToString(TokenType tokenType) {
   case SB_MINUS: return "\'-\'";
   case SB_TIMES: return "\'*\'";
   case SB_SLASH: return "\'/\'";
+  case SB_MOD: return "\'%\'";
   case SB_LPAR: return "\'(\'";
   case SB_RPAR: return "\')\'";
   case SB_LSEL: return "\'(.\'";

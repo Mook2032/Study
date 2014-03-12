@@ -174,12 +174,14 @@ void compileUnsignedConstant(void) {
 		case TK_NUMBER: eat(TK_NUMBER); break;
 		case TK_IDENT:	eat(TK_IDENT); break;
 		case TK_CHAR:	eat(TK_CHAR); break;
+	        case TK_STRING: eat(TK_STRING); break;
 		default: error(ERR_INVALIDCONSTANT, lookAhead->lineNo, lookAhead->colNo);
 	}
 }
 
 void compileConstant(void) {
 	if (lookAhead->tokenType == TK_CHAR) eat(TK_CHAR);
+	else if (lookAhead->tokenType == TK_STRING) eat(TK_STRING);
 	else
 	{
 		if (lookAhead->tokenType == SB_PLUS) eat(SB_PLUS);
@@ -206,6 +208,7 @@ void compileType(void) {
 			eat(KW_OF);
 			compileType();
 			break;
+	        case KW_STRING: eat(KW_STRING); break;
 		default: eat(TK_IDENT);
 	}
 }
@@ -215,6 +218,9 @@ void compileBasicType(void) {
 		eat(KW_INTEGER);
 	else if (lookAhead->tokenType == KW_CHAR)
 		eat(KW_CHAR);
+	else if (lookAhead->tokenType == KW_STRING)
+	        eat(KW_STRING);
+
 	else error(ERR_INVALIDBASICTYPE,lookAhead->lineNo,lookAhead->colNo);
 }
 
@@ -229,8 +235,7 @@ void compileParams(void) {
 }
 
 void compileParams2(void) {
-  //	if (lookAhead->tokenType == SB_SEMICOLON)
-	if (lookAhead->tokenType != KW_END)
+	if (lookAhead->tokenType == SB_SEMICOLON)
 	{
 		eat(SB_SEMICOLON);
 		compileParam();
@@ -251,7 +256,8 @@ void compileStatements(void) {
 }
 
 void compileStatements2(void) {
-	if (lookAhead->tokenType == SB_SEMICOLON)
+  //	if (lookAhead->tokenType == SB_SEMICOLON)
+	if (lookAhead->tokenType != KW_END)
 	{
 		eat(SB_SEMICOLON);
 		compileStatement();
@@ -275,6 +281,9 @@ void compileStatement(void) {
     break;
   case KW_WHILE:
     compileWhileSt();
+    break;
+  case KW_DO:
+    compileDoSt();
     break;
   case KW_FOR:
     compileForSt();
@@ -339,6 +348,16 @@ void compileWhileSt(void) {
   eat(KW_DO);
   compileStatement();
   assert("While statement pased ....");
+}
+
+void compileDoSt(void) {
+  assert("Parsing a do statement ....");
+  eat(KW_DO);
+  compileStatement();
+  eat(KW_WHILE);
+  compileCondition();
+  eat(SB_SEMICOLON);
+  assert("Do statement parsed ....");
 }
 
 void compileForSt(void) {
@@ -438,6 +457,12 @@ void compileTerm2(void) {
 		compileFactor();
 		compileTerm2();
 	}
+	else if (lookAhead->tokenType == SB_MOD)
+	{
+                eat (SB_MOD);
+	        compileFactor();
+	        compileTerm2();
+	}
 }
 
 void compileFactor(void) {
@@ -445,6 +470,7 @@ void compileFactor(void) {
 	{
 		case TK_NUMBER: compileUnsignedConstant(); break;
 		case TK_CHAR: compileUnsignedConstant(); break;
+	        case TK_STRING: compileUnsignedConstant(); break;
 		case TK_IDENT:
 			eat(TK_IDENT);
 			if (lookAhead->tokenType == SB_LPAR) compileArguments();

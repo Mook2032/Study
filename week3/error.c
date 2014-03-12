@@ -19,6 +19,9 @@ void error(ErrorCode err, int lineNo, int colNo) {
   case ERR_INVALIDCHARCONSTANT:
     printf("%d-%d:%s\n", lineNo, colNo, ERM_INVALIDCHARCONSTANT);
     break;
+  case ERR_INVALIDSTRING:
+    printf("%d-%d:%s\n", lineNo,colNo,ERM_INVALIDSTRING);
+    break;
   case ERR_INVALIDSYMBOL:
     printf("%d-%d:%s\n", lineNo, colNo, ERM_INVALIDSYMBOL);
     break;

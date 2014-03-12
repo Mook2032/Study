@@ -118,6 +118,61 @@ Token* readConstChar(void) {
   }
 }
 
+Token* readString(void) {
+	Token* token=makeToken(TK_STRING, lineNo, colNo);
+	int count=0;
+	readChar();
+	if (currentChar == EOF) {
+		token->tokenType = TK_NONE;
+		error(ERR_INVALIDSTRING, token->lineNo, token->colNo);	//The program should quit here, but...
+		return token;		//...just to be safe.
+	}	//Copy from above. And let's add a new error message, as well.
+	while ((charCodes[currentChar]!=CHAR_QUOTE)&&(currentChar!='\n'))
+	{
+		if (count<MAX_IDENT_LEN)
+		{
+		  if (currentChar==92)
+		  {
+			   readChar();
+			   switch (currentChar)
+			     {
+			     case '"': break;
+			     case 't': currentChar=9; break;
+			     case 'n': currentChar=10; break;
+			     case '\n': readChar(); break;
+			     default:
+			       token->string[count++]=(char)currentChar;
+			       if (count>=MAX_IDENT_LEN)
+				 {
+				     error(ERR_IDENTTOOLONG,token->lineNo,token->colNo);
+				     return token;
+		 		 }
+			     }
+
+		  }
+		  
+			token->string[count++]=(char)currentChar;
+			readChar();
+			if (currentChar==EOF)
+			{
+				token->tokenType = TK_NONE;
+				error(ERR_INVALIDSTRING, token->lineNo, token->colNo);
+				return token;
+			}
+		}
+		else
+		{
+			error(ERR_IDENTTOOLONG,token->lineNo,token->colNo);
+			return token;
+		}
+	}
+	if (currentChar=='\n') error(ERR_INVALIDSTRING, token->lineNo, token->colNo);
+	token->string[count]='\0';
+	readChar();				//Uh, unlike other function, this one stop when it get to see that CHAR_QUOTE dude,
+							//so we have to append one to the end.
+	return token;
+}
+
 Token* getToken(void) {
   Token *token;
   int ln, cn;
@@ -144,6 +199,10 @@ Token* getToken(void) {
   case CHAR_SLASH:
     token = makeToken(SB_SLASH, lineNo, colNo);
     readChar(); 
+    return token;
+  case CHAR_MOD:
+    token = makeToken(SB_MOD, lineNo, colNo);
+    readChar();
     return token;
   case CHAR_LT:
     ln = lineNo;
@@ -202,6 +261,7 @@ Token* getToken(void) {
       return makeToken(SB_ASSIGN, ln, cn);
     } else return makeToken(SB_COLON, ln, cn);
   case CHAR_SINGLEQUOTE: return readConstChar();
+  case CHAR_QUOTE: return readString();
   case CHAR_LPAR:
     ln = lineNo;
     cn = colNo;
@@ -255,6 +315,7 @@ void printToken(Token *token) {
   case TK_NUMBER: printf("TK_NUMBER(%s)\n", token->string); break;
   case TK_CHAR: printf("TK_CHAR(\'%s\')\n", token->string); break;
   case TK_EOF: printf("TK_EOF\n"); break;
+  case TK_STRING: printf("TK_STRING(\"%s\")\n",token->string); break;
 
   case KW_PROGRAM: printf("KW_PROGRAM\n"); break;
   case KW_CONST: printf("KW_CONST\n"); break;
@@ -263,6 +324,7 @@ void printToken(Token *token) {
   case KW_INTEGER: printf("KW_INTEGER\n"); break;
   case KW_CHAR: printf("KW_CHAR\n"); break;
   case KW_ARRAY: printf("KW_ARRAY\n"); break;
+  case KW_STRING: printf("KW_STRING\n"); break;
   case KW_OF: printf("KW_OF\n"); break;
   case KW_FUNCTION: printf("KW_FUNCTION\n"); break;
   case KW_PROCEDURE: printf("KW_PROCEDURE\n"); break;
@@ -292,6 +354,7 @@ void printToken(Token *token) {
   case SB_MINUS: printf("SB_MINUS\n"); break;
   case SB_TIMES: printf("SB_TIMES\n"); break;
   case SB_SLASH: printf("SB_SLASH\n"); break;
+  case SB_MOD: printf("SB_MOD\n"); break;
   case SB_LPAR: printf("SB_LPAR\n"); break;
   case SB_RPAR: printf("SB_RPAR\n"); break;
   case SB_LSEL: printf("SB_LSEL\n"); break;
