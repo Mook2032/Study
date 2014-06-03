@@ -31,10 +31,6 @@ int computeNestedLevel(Scope* scope) {
   
   Scope* tempScope = symtab->currentScope;
   while (scope != tempScope){
-    if (tempScope == NULL){
-      count = 0;
-      break;
-    }
     tempScope = tempScope->outer;
     count++;
   } 
@@ -43,64 +39,33 @@ int computeNestedLevel(Scope* scope) {
 }
 
 void genVariableAddress(Object* var) {
-  int level = computeNestedLevel(VARIABLE_SCOPE(var));
-  genLA(level, VARIABLE_OFFSET(var));
+  int level = computeNestedLevel(var->varAttrs->scope);
+  genLA(level, var->varAttrs->localOffset);
 }
 
 void genVariableValue(Object* var) {
-  int level = computeNestedLevel(VARIABLE_SCOPE(var));
-  genLV(level, VARIABLE_OFFSET(var));
+  int level = computeNestedLevel(var->varAttrs->scope);
+  genLV(level, var->varAttrs->localOffset);
 }
 
 void genParameterAddress(Object* param) {
-  int level = computeNestedLevel(PARAMETER_SCOPE(param));
-  genLA(level, PARAMETER_OFFSET(param));
+  int level = computeNestedLevel(param->paramAttrs->scope);
+  genLA(level, param->paramAttrs->localOffset);
 }
 
 void genParameterValue(Object* param) {
-  int level = computeNestedLevel(PARAMETER_SCOPE(param));
-  genLV(level, PARAMETER_OFFSET(param));
+  int level = computeNestedLevel(param->paramAttrs->scope);
+  genLV(level, param->paramAttrs->localOffset);
 }
 
 void genReturnValueAddress(Object* func) {
-  int level = computeNestedLevel(FUNCTION_SCOPE(func));
+  int level = computeNestedLevel(func->funcAttrs->scope);
   genLA(level, 0);
 }
 
 void genReturnValueValue(Object* func) {
-  int level = computeNestedLevel(FUNCTION_SCOPE(func));
+  int level = computeNestedLevel(func->funcAttrs->scope);
   genLV(level, 0);
-}
-
-int computeCallLevel(Scope* scope){  
-  // find the function that contains this scope, for safe, really
-  scope = scope->outer;
-  Object* ownerCall = scope == NULL? NULL : scope->owner;
-  int count = 0;
-  while (ownerCall != NULL && ownerCall->kind != OBJ_FUNCTION && ownerCall->kind != OBJ_PROCEDURE){
-    scope = scope->outer;
-    if (scope != NULL){
-      ownerCall = scope->owner;
-    } else {
-      ownerCall = NULL;
-    }
-  }
-  //where the real calculation happen
-  Object* owner = symtab->currentScope->owner;
-  Scope* tempScope = symtab->currentScope;
-  while (owner != NULL && owner != ownerCall){
-    if ( owner->kind == OBJ_FUNCTION || owner->kind == OBJ_PROCEDURE){
-      count++;
-    }
-    tempScope = tempScope->outer;
-    if (tempScope != NULL){
-      owner = tempScope->owner;
-    } else {
-      owner = NULL;
-    }
-  }
-
-  return count;
 }
 
 void genPredefinedProcedureCall(Object* proc) {
@@ -117,7 +82,7 @@ void genPredefinedProcedureCall(Object* proc) {
 }
 
 void genProcedureCall(Object* proc) {
-  int level = computeCallLevel(PROCEDURE_SCOPE(proc));
+  int level = computeNestedLevel(proc->procAttrs->scope->outer);
   genCALL(level , proc->procAttrs->codeAddress);
 }
 
@@ -133,7 +98,7 @@ void genPredefinedFunctionCall(Object* func) {
 }
 
 void genFunctionCall(Object* func) {
-  int level = computeCallLevel(FUNCTION_SCOPE(func));
+  int level = computeNestedLevel(func->funcAttrs->scope->outer);
   genCALL(level, func->funcAttrs->codeAddress);
 }
 

@@ -426,17 +426,16 @@ Type* compileLValue(void) {
       varType = var->varAttrs->type;
     break;
   case OBJ_PARAMETER:
-    // TODO: push parameter value onto stack if the parameter is a reference (defined with keyword VAR
-    //       push parameter address onto stack if the parameter is a value
     if (var->paramAttrs->kind == PARAM_VALUE){
       genParameterAddress(var);
-    } else {
+    }
+	else
+	{
       genParameterValue(var);
     }
     varType = var->paramAttrs->type;
     break;
   case OBJ_FUNCTION:
-    // TODO: push the return value address onto the stack
     genReturnValueAddress(var);
     varType = var->funcAttrs->returnType;
     break;
@@ -461,7 +460,6 @@ void compileAssignSt(void) {
 }
 
 void compileCallSt(void) {
-  // TODO: generate call-statement
   Object* proc;
 
   eat(KW_CALL);
@@ -472,7 +470,9 @@ void compileCallSt(void) {
   if (isPredefinedProcedure(proc)) {
     compileArguments(proc->procAttrs->paramList);
     genPredefinedProcedureCall(proc);
-  } else {
+  }
+  else
+  {
     genINT(4);
     compileArguments(proc->procAttrs->paramList);
     genDCT(4 + PROCEDURE_PARAM_COUNT(proc));
@@ -792,9 +792,7 @@ Type* compileTerm2(Type* argType1) {
     checkIntType(argType1);
     argType2 = compileFactor();
     checkIntType(argType2);
-
     genML();
-
     resultType = compileTerm2(argType1);
     break;
   case SB_SLASH:
@@ -802,9 +800,7 @@ Type* compileTerm2(Type* argType1) {
     checkIntType(argType1);
     argType2 = compileFactor();
     checkIntType(argType2);
-
     genDV();
-
     resultType = compileTerm2(argType1);
     break;
     // check the FOLLOW set
@@ -851,7 +847,6 @@ Type* compileFactor(void) {
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredIdent(currentToken->string);
-
     switch (obj->kind) {
     case OBJ_CONSTANT:
       switch (obj->constAttrs->value->type) {
@@ -869,34 +864,38 @@ Type* compileFactor(void) {
       break;
     case OBJ_VARIABLE:
       if (obj->varAttrs->type->typeClass == TP_ARRAY) {
-	genVariableAddress(obj);
-	type = compileIndexes(obj->varAttrs->type);
-	genLI();
-      } else {
-	type = obj->varAttrs->type;
-	genVariableValue(obj);
+		genVariableAddress(obj);
+		type = compileIndexes(obj->varAttrs->type);
+		genLI();
+      }
+	  else
+	  {
+		type = obj->varAttrs->type;
+		genVariableValue(obj);
       }
       break;
     case OBJ_PARAMETER:
-      // TODO: push parameter's value onto the stack
       if (obj->paramAttrs->kind == PARAM_REFERENCE){
-	genParameterValue(obj);
-	genLI();
-      } else {
-	genParameterValue(obj);
+		genParameterValue(obj);
+		genLI();
+      }
+	  else
+	  {
+		genParameterValue(obj);
       }
       type = obj->paramAttrs->type;
       break;
     case OBJ_FUNCTION:
-      // TODO: generate function call
       if (isPredefinedFunction(obj)) {
-	compileArguments(obj->funcAttrs->paramList);
-	genPredefinedFunctionCall(obj);
-      } else {
-	genINT(4);
-	compileArguments(obj->funcAttrs->paramList);
-	genDCT(4 + FUNCTION_PARAM_COUNT(obj));
-	genFunctionCall(obj);
+		compileArguments(obj->funcAttrs->paramList);
+		genPredefinedFunctionCall(obj);
+      }
+	  else
+	  {
+		genINT(4);
+		compileArguments(obj->funcAttrs->paramList);
+		genDCT(4 + FUNCTION_PARAM_COUNT(obj));
+		genFunctionCall(obj);
       }
       type = obj->funcAttrs->returnType;
       break;
@@ -918,7 +917,6 @@ Type* compileFactor(void) {
 }
 
 Type* compileIndexes(Type* arrayType) {
-  // TODO: Generate code for computing array element address
   Type* type;
   
   while (lookAhead->tokenType == SB_LSEL) {
@@ -926,11 +924,10 @@ Type* compileIndexes(Type* arrayType) {
     type = compileExpression();
     checkIntType(type);
     checkArrayType(arrayType);
-    genLC(sizeOfType(arrayType)/arrayType->arraySize);
-    genML();
-    genAD();
-
     arrayType = arrayType->elementType;
+	genLC(4*sizeOfType(arrayType));
+	genML();
+    genSB();
     eat(SB_RSEL);
   }
   checkBasicType(arrayType);

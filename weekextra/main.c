@@ -23,8 +23,7 @@ void printUsage(void) {
 
 /******************************************************************/
 
-int main(int argc, char *argv[]) {
-  int i; 
+int main(int argc, char *argv[]) { 
 
   if (argc <= 1) {
     printf("kplc: no input file.\n");

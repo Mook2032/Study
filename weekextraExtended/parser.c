@@ -657,7 +657,7 @@ void compileArguments(ObjectNode* paramList) {
     while (lookAhead->tokenType == SB_COMMA) {
       eat(SB_COMMA);
       if (node == NULL)
-	error(ERR_PARAMETERS_ARGUMENTS_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+	  error(ERR_PARAMETERS_ARGUMENTS_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
       compileArgument(node->object);
       node = node->next;
     }
